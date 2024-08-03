@@ -16,8 +16,12 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
         backgroundColor: Colors.deepPurple,
         appBar: AppBar(
+          //center the title
+          centerTitle: true,
           title: Text('My App'),
-          backgroundColor: Colors.deepPurple,
+          backgroundColor: Colors.lightBlue,
+          leading: Icon(Icons.menu),
+          actions: [IconButton(onPressed: (){}, icon: Icon(Icons.search, color: Colors.white))],
         ),
         body: Center(
           child: Container(
