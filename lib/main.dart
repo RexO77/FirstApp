@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
           title: Text('My App'),
           backgroundColor: Colors.lightBlue,
           leading: Icon(Icons.menu),
-          actions: [IconButton(onPressed: (){}, icon: Icon(Icons.search, color: Colors.white))],//just 
+          actions: [IconButton(onPressed: (){}, icon: Icon(Icons.search, color: Colors.white))],
         ),
         body: Center(
           child: Container(
