@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
             color: Colors.white,
             //curve the corners of the container
             borderRadius: BorderRadius.circular(25),
-            ),
+            ),//test 1
             padding: EdgeInsets.all(100),
             child: Text(
               'Hello World',
