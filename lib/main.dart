@@ -3,45 +3,106 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(WallpaperApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class WallpaperApp extends StatelessWidget {
+  const WallpaperApp({super.key});
 
-@override
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        backgroundColor: Colors.deepPurple,
-        appBar: AppBar(
-          //center the title
-          centerTitle: true,
-          title: Text('My App'),
-          backgroundColor: Colors.lightBlue,
-          leading: Icon(Icons.menu),
-          actions: [IconButton(onPressed: (){}, icon: Icon(Icons.search, color: Colors.white))],
+      title: 'Wallpaper Showcase',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: WallpaperHomePage(),
+    );
+  }
+}
+
+class WallpaperHomePage extends StatefulWidget {
+  const WallpaperHomePage({super.key});
+
+  @override
+  _WallpaperHomePageState createState() => _WallpaperHomePageState();
+}
+
+class _WallpaperHomePageState extends State<WallpaperHomePage> {
+  // Sample list of wallpaper URLs
+  final List<String> wallpapers = [
+    'https://example.com/wallpaper1.jpg',
+    'https://example.com/wallpaper2.jpg',
+    // Add more URLs
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Wallpaper Showcase'),
+        centerTitle: true,
+        leading: Icon(Icons.menu),
+        actions: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.search)),
+        ],
+      ),
+      body: GridView.builder(
+        padding: EdgeInsets.all(10),
+        itemCount: wallpapers.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, // Two images per row
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
-        body: Center(
-          child: Container(
-            height: 300,
-            width: 300,
-            decoration: BoxDecoration(
-            color: Colors.white,
-            //curve the corners of the container
-            borderRadius: BorderRadius.circular(25),
-            ),//1
-            padding: EdgeInsets.all(100),
-            child: Text(
-              'Hello World',
-              style: TextStyle(
-                fontSize: 30,
-                color: Colors.deepPurple,
-                fontWeight: FontWeight.normal,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              // Navigate to detail view with animation
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => WallpaperDetailPage(
+                    imageUrl: wallpapers[index],
+                  ),
+                ),
+              );
+            },
+            child: Hero(
+              tag: 'wallpaper$index',
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(wallpapers[index]),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
             ),
-          ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class WallpaperDetailPage extends StatelessWidget {
+  final String imageUrl;
+
+  WallpaperDetailPage({super.key, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Wallpaper Detail'),
+      ),
+      body: Center(
+        child: Hero(
+          tag: 'wallpaper$imageUrl',
+          child: Image.network(imageUrl),
         ),
       ),
     );
