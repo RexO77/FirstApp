@@ -9,7 +9,6 @@ void main() {
 class WallpaperApp extends StatelessWidget {
   const WallpaperApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -65,6 +64,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
                 MaterialPageRoute(
                   builder: (context) => WallpaperDetailPage(
                     imageUrl: wallpapers[index],
+                    tag: 'wallpaper$index',
                   ),
                 ),
               );
@@ -90,8 +90,9 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
 
 class WallpaperDetailPage extends StatelessWidget {
   final String imageUrl;
+  final String tag;
 
-  WallpaperDetailPage({super.key, required this.imageUrl});
+  WallpaperDetailPage({super.key, required this.imageUrl, required this.tag});
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +102,7 @@ class WallpaperDetailPage extends StatelessWidget {
       ),
       body: Center(
         child: Hero(
-          tag: 'wallpaper$imageUrl',
+          tag: tag,
           child: Image.network(imageUrl),
         ),
       ),
