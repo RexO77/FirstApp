@@ -13,7 +13,7 @@ class WallpaperApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Wallpaper Carousel',
+      title: 'Wallpaper Showcase',
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
@@ -28,44 +28,83 @@ class WallpaperHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> wallpapers = [
-      'assets/mobilewalls/1.jpg',
-      'assets/mobilewalls/2.jpeg',
-      'assets/mobilewalls/3.jpg',
-      'assets/mobilewalls/4.jpeg',
       'assets/mobilewalls/5.jpeg',
       'assets/mobilewalls/6.jpeg',
       'assets/mobilewalls/7.jpeg',
+      'assets/mobilewalls/8.jpg',
+      'assets/mobilewalls/9.jpeg',
+      'assets/mobilewalls/10.png',
+      'assets/mobilewalls/11.png',
+      'assets/mobilewalls/12.png',
+      'assets/mobilewalls/13.png',
+      'assets/mobilewalls/14.png',
+      'assets/mobilewalls/15.png',
+      'assets/mobilewalls/16.png',
+      'assets/mobilewalls/17.png',
+      'assets/mobilewalls/18.png',
       // Add more image paths
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wallpaper Carousel'),
+        title: const Text('Wallpaper Showcase'),
         centerTitle: true,
       ),
-      body: CarouselSlider(
-        options: CarouselOptions(
-          height: MediaQuery.of(context).size.height * 0.6,
-          autoPlay: true,
-          enlargeCenterPage: true,
-        ),
-        items: wallpapers.map((item) {
-          return Builder(
-            builder: (BuildContext context) {
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 5),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.asset(
-                    item,
-                    fit: BoxFit.cover,
-                    width: MediaQuery.of(context).size.width,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Carousel Slider
+            CarouselSlider(
+              options: CarouselOptions(
+                height: MediaQuery.of(context).size.height * 0.4,
+                autoPlay: true,
+                enlargeCenterPage: true,
+              ),
+              items: wallpapers.map((item) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.asset(
+                      item,
+                      fit: BoxFit.cover,
+                      width: MediaQuery.of(context).size.width,
+                    ),
                   ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 20),
+            // Grid View
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GridView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: wallpapers.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 2x2 grid
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                 ),
-              );
-            },
-          );
-        }).toList(),
+                itemBuilder: (context, index) {
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.asset(
+                        wallpapers[index],
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
