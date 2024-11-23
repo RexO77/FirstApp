@@ -2,108 +2,197 @@
 
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:ui'; // For glassmorphic effect
 
 void main() {
-  runApp(const WallpaperApp());
+  runApp(MyApp());
 }
 
-class WallpaperApp extends StatelessWidget {
-  const WallpaperApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Wallpaper Showcase',
-      theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
-      ),
+      title: 'TrueWalls',
+      theme: ThemeData.dark(),
       home: const WallpaperHomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class WallpaperHomePage extends StatelessWidget {
+class WallpaperHomePage extends StatefulWidget {
   const WallpaperHomePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
+  _WallpaperHomePageState createState() => _WallpaperHomePageState();
+}
+
+class _WallpaperHomePageState extends State<WallpaperHomePage> {
+  int _currentIndex = 0;
+  final Set<String> favorites = {};
+
+  final List<String> wallpapers = [
+    'assets/mobilewalls/10.png',
+    'assets/mobilewalls/11.png',
+    'assets/mobilewalls/12.png',
+    'assets/mobilewalls/13.png',
+    'assets/mobilewalls/14.png',
+    'assets/mobilewalls/15.png',
+    'assets/mobilewalls/16.png',
+    'assets/mobilewalls/17.png',
+    'assets/mobilewalls/18.png',
+    'assets/mobilewalls/19.png',
+    'assets/mobilewalls/20.png',
+    'assets/mobilewalls/21.png',
+    'assets/mobilewalls/22.png',
+    'assets/mobilewalls/23.png',
+    'assets/mobilewalls/24.png',
+    'assets/mobilewalls/25.png',
+    // Add more image paths
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    final List<String> wallpapers = [
-      'assets/mobilewalls/5.jpeg',
-      'assets/mobilewalls/6.jpeg',
-      'assets/mobilewalls/7.jpeg',
-      'assets/mobilewalls/8.jpg',
-      'assets/mobilewalls/9.jpeg',
-      'assets/mobilewalls/10.png',
-      'assets/mobilewalls/11.png',
-      'assets/mobilewalls/12.png',
-      'assets/mobilewalls/13.png',
-      'assets/mobilewalls/14.png',
-      'assets/mobilewalls/15.png',
-      'assets/mobilewalls/16.png',
-      'assets/mobilewalls/17.png',
-      'assets/mobilewalls/18.png',
-      // Add more image paths
+    final List<Widget> pages = [
+      // Home Page
+      Column(
+        children: [
+          Expanded(
+            child: CarouselSlider.builder(
+              itemCount: wallpapers.length,
+              itemBuilder: (context, index, realIndex) {
+                final image = wallpapers[index];
+                final isFavorite = favorites.contains(image);
+                return GestureDetector(
+                  onDoubleTap: () {
+                    setState(() {
+                      if (isFavorite) {
+                        favorites.remove(image);
+                      } else {
+                        favorites.add(image);
+                      }
+                    });
+                  },
+                  child: Stack(
+                    alignment: Alignment.topRight,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Image.asset(
+                            image,
+                            fit: BoxFit.cover,
+                            width: MediaQuery.of(context).size.width,
+                          ),
+                        ),
+                      ),
+                      if (isFavorite)
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.favorite,
+                            color: Colors.red,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              },
+              options: CarouselOptions(
+                scrollDirection: Axis.vertical,
+                autoPlay: false,
+                autoPlayInterval: const Duration(seconds: 5),
+                enlargeCenterPage: true,
+              ),
+            ),
+          ),
+        ],
+      ),
+      // Categories Page (Placeholder)
+      const Center(child: Text('Categories')),
+      // Favorites Page
+      GridView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: favorites.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, // Adjust as needed
+          childAspectRatio: 0.7,
+        ),
+        itemBuilder: (context, index) {
+          final image = favorites.elementAt(index);
+          return Container(
+            margin: const EdgeInsets.all(5),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.asset(
+                image,
+                fit: BoxFit.cover,
+              ),
+            ),
+          );
+        },
+      ),
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Wallpaper Showcase'),
-        centerTitle: true,
+      body: pages[_currentIndex],
+      bottomNavigationBar: GlassmorphicNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Carousel Slider
-            CarouselSlider(
-              options: CarouselOptions(
-                height: MediaQuery.of(context).size.height * 0.4,
-                autoPlay: true,
-                enlargeCenterPage: true,
+    );
+  }
+}
+
+class GlassmorphicNavigationBar extends StatelessWidget {
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  const GlassmorphicNavigationBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 60,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.2),
+      ),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: BottomNavigationBar(
+            currentIndex: currentIndex,
+            onTap: onTap,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: Colors.white,
+            unselectedItemColor: Colors.grey[400],
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
               ),
-              items: wallpapers.map((item) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.asset(
-                      item,
-                      fit: BoxFit.cover,
-                      width: MediaQuery.of(context).size.width,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-            // Grid View
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: wallpapers.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // 2x2 grid
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemBuilder: (context, index) {
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.asset(
-                        wallpapers[index],
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  );
-                },
+              BottomNavigationBarItem(
+                icon: Icon(Icons.category),
+                label: 'Categories',
               ),
-            ),
-          ],
+              BottomNavigationBarItem(
+                icon: Icon(Icons.favorite),
+                label: 'Favorite',
+              ),
+            ],
+          ),
         ),
       ),
     );
