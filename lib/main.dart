@@ -3,9 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'dart:ui'; // For glassmorphic effect
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -14,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TrueWalls',
+      title: 'ArtistryWalls',
       theme: ThemeData.dark(),
       home: const WallpaperHomePage(),
       debugShowCheckedModeBanner: false,
@@ -33,6 +36,8 @@ class WallpaperHomePage extends StatefulWidget {
 class _WallpaperHomePageState extends State<WallpaperHomePage> {
   int _currentIndex = 0;
   final Set<String> favorites = {};
+  int _tapCounter = 0;
+  DateTime _lastTapTime = DateTime.now();
 
   final List<String> wallpapers = [
     'assets/mobilewalls/10.png',
@@ -54,6 +59,49 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
     // Add more image paths
   ];
 
+  Future<void> _downloadImage(String assetPath) async {
+    try {
+      final byteData = await rootBundle.load(assetPath);
+      final buffer = byteData.buffer;
+      final directory = await getExternalStorageDirectory();
+      final filePath = '${directory?.path}/${assetPath.split('/').last}';
+      final file = File(filePath);
+      await file.writeAsBytes(buffer.asUint8List(
+          byteData.offsetInBytes, byteData.lengthInBytes));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image downloaded to $filePath')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to download image')),
+      );
+    }
+  }
+
+  void _handleTap(String image) {
+    final now = DateTime.now();
+    if (now.difference(_lastTapTime) > const Duration(milliseconds: 500)) {
+      _tapCounter = 0;
+    }
+    _tapCounter++;
+    _lastTapTime = now;
+
+    if (_tapCounter == 2) {
+      // Double-tap detected - Toggle favorite
+      setState(() {
+        if (favorites.contains(image)) {
+          favorites.remove(image);
+        } else {
+          favorites.add(image);
+        }
+      });
+    } else if (_tapCounter == 3) {
+      // Triple-tap detected - Download image
+      _downloadImage(image);
+      _tapCounter = 0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
@@ -67,15 +115,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
                 final image = wallpapers[index];
                 final isFavorite = favorites.contains(image);
                 return GestureDetector(
-                  onDoubleTap: () {
-                    setState(() {
-                      if (isFavorite) {
-                        favorites.remove(image);
-                      } else {
-                        favorites.add(image);
-                      }
-                    });
-                  },
+                  onTap: () => _handleTap(image),
                   child: Stack(
                     alignment: Alignment.topRight,
                     children: [
@@ -139,6 +179,9 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
     ];
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('ArtistryWalls'),
+      ),
       body: pages[_currentIndex],
       bottomNavigationBar: GlassmorphicNavigationBar(
         currentIndex: _currentIndex,
