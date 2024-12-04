@@ -18,7 +18,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ArtistryWalls',
-      theme: ThemeData.dark(),
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.indigo,
+        fontFamily: 'Roboto', // Use a custom font
+      ),
       home: const WallpaperHomePage(),
       debugShowCheckedModeBanner: false,
     );
@@ -33,11 +37,13 @@ class WallpaperHomePage extends StatefulWidget {
   _WallpaperHomePageState createState() => _WallpaperHomePageState();
 }
 
-class _WallpaperHomePageState extends State<WallpaperHomePage> {
+class _WallpaperHomePageState extends State<WallpaperHomePage>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   final Set<String> favorites = {};
   int _tapCounter = 0;
   DateTime _lastTapTime = DateTime.now();
+  late AnimationController _animationController;
 
   final List<String> wallpapers = [
     'assets/mobilewalls/10.png',
@@ -58,6 +64,15 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
     'assets/mobilewalls/25.png',
     // Add more image paths
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+  }
 
   Future<void> _downloadImage(String assetPath) async {
     try {
@@ -117,10 +132,21 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
                 return GestureDetector(
                   onTap: () => _handleTap(image),
                   child: Stack(
-                    alignment: Alignment.topRight,
                     children: [
-                      Container(
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
                         margin: const EdgeInsets.symmetric(horizontal: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black38,
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(15),
                           child: Image.asset(
@@ -131,11 +157,13 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
                         ),
                       ),
                       if (isFavorite)
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
+                        Positioned(
+                          top: 10,
+                          right: 10,
                           child: Icon(
                             Icons.favorite,
-                            color: Colors.red,
+                            color: Colors.redAccent,
+                            size: 30,
                           ),
                         ),
                     ],
@@ -144,16 +172,22 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
               },
               options: CarouselOptions(
                 scrollDirection: Axis.vertical,
-                autoPlay: false,
+                autoPlay: true,
                 autoPlayInterval: const Duration(seconds: 5),
                 enlargeCenterPage: true,
+                viewportFraction: 0.8,
               ),
             ),
           ),
         ],
       ),
       // Categories Page (Placeholder)
-      const Center(child: Text('Categories')),
+      Center(
+        child: Text(
+          'Categories',
+          style: Theme.of(context).textTheme.headline4,
+        ),
+      ),
       // Favorites Page
       GridView.builder(
         padding: const EdgeInsets.all(8),
@@ -166,6 +200,16 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
           final image = favorites.elementAt(index);
           return Container(
             margin: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 5,
+                  offset: Offset(0, 3),
+                ),
+              ],
+            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: Image.asset(
@@ -179,10 +223,17 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
     ];
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('ArtistryWalls'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      body: pages[_currentIndex],
+      body: Stack(
+        children: [
+          pages[_currentIndex],
+        ],
+      ),
       bottomNavigationBar: GlassmorphicNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -208,22 +259,28 @@ class GlassmorphicNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
+      height: 70,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(30),
       ),
-      child: ClipRect(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: BottomNavigationBar(
             currentIndex: currentIndex,
             onTap: onTap,
             backgroundColor: Colors.transparent,
+            elevation: 0,
             selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.grey[400],
+            unselectedItemColor: Colors.white70,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
             items: const [
               BottomNavigationBarItem(
-                icon: Icon(Icons.home),
+                icon: Icon(Icons.home_filled),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
