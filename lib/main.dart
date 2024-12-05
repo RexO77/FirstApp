@@ -43,7 +43,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage>
   final Set<String> favorites = {};
   int _tapCounter = 0;
   DateTime _lastTapTime = DateTime.now();
-  late AnimationController _animationController;
+  late AnimationController animationController;
 
   final List<String> wallpapers = [
     'assets/mobilewalls/10.png',
@@ -68,7 +68,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage>
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+      animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
@@ -139,7 +139,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage>
                         margin: const EdgeInsets.symmetric(horizontal: 5),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
                               color: Colors.black38,
                               blurRadius: 10,
@@ -185,7 +185,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage>
       Center(
         child: Text(
           'Categories',
-          style: Theme.of(context).textTheme.headline4,
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
       // Favorites Page
@@ -202,7 +202,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage>
             margin: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
-              boxShadow: [
+              boxShadow: const [
                 BoxShadow(
                   color: Colors.black26,
                   blurRadius: 5,
