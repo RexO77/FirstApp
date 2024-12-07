@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:swipe_cards/swipe_cards.dart';
 import 'dart:ui'; // For glassmorphic effect
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -35,12 +36,10 @@ class WallpaperHomePage extends StatefulWidget {
   _WallpaperHomePageState createState() => _WallpaperHomePageState();
 }
 
-class _WallpaperHomePageState extends State<WallpaperHomePage>
-    with SingleTickerProviderStateMixin {
-  int _currentIndex = 0;
+class _WallpaperHomePageState extends State<WallpaperHomePage> {
+  late MatchEngine _matchEngine;
   final Set<String> favorites = {};
-  int _tapCounter = 0;
-  DateTime _lastTapTime = DateTime.now();
+  List<SwipeItem> _swipeItems = [];
 
   final List<String> wallpapers = [
     'assets/mobilewalls/10.png',
@@ -61,6 +60,36 @@ class _WallpaperHomePageState extends State<WallpaperHomePage>
     'assets/mobilewalls/25.png',
     // Add more image paths
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    for (var image in wallpapers) {
+      _swipeItems.add(
+        SwipeItem(
+          content: image,
+          likeAction: () {
+            // Swiped right - Add to favorites
+            setState(() {
+              favorites.add(image);
+            });
+          },
+          nopeAction: () async {
+            // Swiped left - Set as wallpaper
+            await _setWallpaper(image);
+          },
+        ),
+      );
+    }
+
+    _matchEngine = MatchEngine(swipeItems: _swipeItems);
+  }
+
+  Future<void> _setWallpaper(String assetPath) async {
+    // Implement platform-specific code to set the wallpaper
+    // This may require additional permissions and packages
+  }
 
   Future<void> _downloadImage(String assetPath) async {
     try {
@@ -137,59 +166,47 @@ class _WallpaperHomePageState extends State<WallpaperHomePage>
         child: Column(
           children: [
             Expanded(
-              child: CarouselSlider.builder(
-                itemCount: wallpapers.length,
-                itemBuilder: (context, index, realIndex) {
+              child: SwipeCards(
+                matchEngine: _matchEngine,
+                itemBuilder: (context, index) {
                   final image = wallpapers[index];
-                  final isFavorite = favorites.contains(image);
-                  return GestureDetector(
-                    onTap: () => _handleTap(image),
-                    child: Stack(
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
-                          margin: const EdgeInsets.symmetric(horizontal: 5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: CupertinoColors.systemGrey,
-                                blurRadius: 10,
-                                offset: Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Image.asset(
-                              image,
-                              fit: BoxFit.cover,
-                              width: MediaQuery.of(context).size.width,
-                            ),
-                          ),
+                  return Container(
+                    margin: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: CupertinoColors.systemGrey,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
                         ),
-                        if (isFavorite)
-                          const Positioned(
-                            top: 10,
-                            right: 10,
-                            child: Icon(
-                              CupertinoIcons.heart_fill,
-                              color: CupertinoColors.systemRed,
-                              size: 30,
-                            ),
-                          ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.asset(
+                        image,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+                onStackFinished: () {
+                  // Handle when all cards are swiped
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (_) => CupertinoAlertDialog(
+                      title: const Text('No More Wallpapers'),
+                      content: const Text('You have swiped through all wallpapers.'),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: const Text('OK'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
                       ],
                     ),
                   );
                 },
-                options: CarouselOptions(
-                  scrollDirection: Axis.horizontal,
-                  autoPlay: true,
-                  autoPlayInterval: const Duration(seconds: 5),
-                  enlargeCenterPage: true,
-                  viewportFraction: 0.8,
-                ),
               ),
             ),
           ],
