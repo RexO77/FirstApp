@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/cupertino.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'dart:ui'; // For glassmorphic effect
 import 'dart:io';
@@ -40,6 +39,9 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
   late MatchEngine _matchEngine;
   final Set<String> favorites = {};
   List<SwipeItem> _swipeItems = [];
+  DateTime _lastTapTime = DateTime.now();
+  int _tapCounter = 0;
+  int _currentIndex = 0;
 
   final List<String> wallpapers = [
     'assets/mobilewalls/10.png',
@@ -58,6 +60,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
     'assets/mobilewalls/23.png',
     'assets/mobilewalls/24.png',
     'assets/mobilewalls/25.png',
+    'assets/mobilewalls/26.png',
     // Add more image paths
   ];
 
