@@ -61,6 +61,7 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
     'assets/mobilewalls/24.png',
     'assets/mobilewalls/25.png',
     'assets/mobilewalls/26.png',
+    'assets/mobilewalls/27.png',
     // Add more image paths
   ];
 
