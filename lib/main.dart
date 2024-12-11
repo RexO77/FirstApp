@@ -38,7 +38,7 @@ class WallpaperHomePage extends StatefulWidget {
 class _WallpaperHomePageState extends State<WallpaperHomePage> {
   late MatchEngine _matchEngine;
   final Set<String> favorites = {};
-  List<SwipeItem> _swipeItems = [];
+  final List<SwipeItem> _swipeItems = [];
   DateTime _lastTapTime = DateTime.now();
   int _tapCounter = 0;
   int _currentIndex = 0;
@@ -296,5 +296,5 @@ class _WallpaperHomePageState extends State<WallpaperHomePage> {
         return pages[index];
       },
     );
-  }
+  }//funny 
 }
