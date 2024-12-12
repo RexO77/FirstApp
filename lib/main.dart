@@ -2,7 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:swipe_cards/swipe_cards.dart';
-import 'dart:ui'; // For glassmorphic effect
+// For glassmorphic effect
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart' show rootBundle;
